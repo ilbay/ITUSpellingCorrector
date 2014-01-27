@@ -18,6 +18,16 @@ public class Word {
 		this.suffix = suffix;
 	}
 	
+	public String toString()
+	{
+		return stem + "+" + suffix;
+	}
+	
+	public int hashCode()
+	{
+		return stem.hashCode() + suffix.hashCode();
+	}
+	
 	private String stem;
 	private String suffix;
 

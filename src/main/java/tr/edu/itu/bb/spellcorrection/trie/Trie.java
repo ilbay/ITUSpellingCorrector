@@ -95,6 +95,36 @@ public class Trie {
 
     }
 
+    /**
+     * @param word Represents the word to which rules are applied
+     * @return The list of stem candidates of the word to which rules are applied
+     */
+    public List<Word> getRootWords(String word)
+    {
+    	ArrayList<Word> rootWords = new ArrayList<Word>();
+    	Node currentNode = this.rootNode;
+    	    	
+    	for(char c : word.toCharArray())
+    	{
+    		currentNode = currentNode.getSubNode(c);
+
+    		if(currentNode == null)
+    		{
+    			break;
+    		}
+
+    		if(currentNode.getOutput() != null)
+    		{
+    			Word rootWord = new Word();
+    			rootWord.setStem(currentNode.getOutput());
+    			rootWord.setSuffix(word.substring(currentNode.getOutput().length()));
+    			rootWords.add(rootWord);
+    		}
+    	}
+
+    	return rootWords;
+    }
+
     public static void main(String[] args) throws IOException, InterruptedException {
 
         test();

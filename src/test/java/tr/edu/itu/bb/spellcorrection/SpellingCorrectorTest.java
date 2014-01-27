@@ -20,6 +20,12 @@ public class SpellingCorrectorTest {
 
     private static final int MAX_DEPTH = 2;
     private static final int WINDOW_SIZE = 3;
+    
+    public static void main(String[] args) throws Exception
+    {
+    	SpellingCorrectorTest test = new SpellingCorrectorTest();
+    	test.testSpellingCorrector();
+    }
 
     @Test
     public void testSpellingCorrector() throws IOException {
@@ -31,6 +37,10 @@ public class SpellingCorrectorTest {
         init();
 
         Trie trie = buildVocabularyTrie();
+        
+        System.out.println(trie.contains("teşbih"));
+        
+        System.out.println(trie.getRootWords("teşbihte"));
 
         List<Rule> rules = buildSortedRules();
 
