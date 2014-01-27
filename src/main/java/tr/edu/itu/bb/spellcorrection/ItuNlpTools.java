@@ -26,7 +26,7 @@ public class ItuNlpTools {
     private ItuNlpTools() throws Exception {
 
         this.bootstrap = new Bootstrap(TRAINING_FILE, null, CHAR_FILE, DEFAULT_DEPTH, DEFAULT_CANDIDATE_SIZE, DEFAULT_WINDOW_SIZE, TURKISH_VALIDATOR);
-        bootstrap.init();
+        bootstrap.init(); //kuralları, bir eklemeli kuralları oluşturuyor. kuralları aho corasick trie'ya ekliyor.
 
     }
     

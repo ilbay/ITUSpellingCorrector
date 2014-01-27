@@ -85,7 +85,7 @@ public final class Bootstrap {
     public void init() throws Exception {
 
         this.allRules = buildSortedRules();
-        this.addOneCharRules = getAddOneCharRules(this.allRules);
+        this.addOneCharRules = getAddOneCharRules(this.allRules); //bir karakter ekleme kuralları
         this.ahoCorasick =  buildAhoCorasick(this.allRules);
 
     }
@@ -214,6 +214,7 @@ public final class Bootstrap {
 
             String[] parts = line.split("=>");
 
+            //Buradaki windowSize, Wang[0]'in makalesinde kurallar oluşturulurken kullanılan sınır değerlerini belirtiyor.
             List<Transformation> transformations = LevenshteinDistance.computeLevenshteinDistance(parts[0], parts[1], windowSize);
 
             for (Transformation transformation : transformations) {
