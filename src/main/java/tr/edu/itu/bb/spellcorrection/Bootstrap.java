@@ -3,6 +3,7 @@ package tr.edu.itu.bb.spellcorrection;
 import tr.edu.itu.bb.spellcorrection.ahocorasick.AhoCorasick;
 import tr.edu.itu.bb.spellcorrection.ahocorasick.SearchResult;
 import tr.edu.itu.bb.spellcorrection.levenshtein.*;
+import tr.edu.itu.bb.spellcorrection.trie.Trie;
 import tr.edu.itu.bb.spellcorrection.util.CharacterUtil;
 import tr.edu.itu.bb.spellcorrection.util.NotMisspelledWordException;
 import tr.edu.itu.bb.spellcorrection.util.Util;
@@ -29,6 +30,7 @@ public final class Bootstrap {
     private final String characterFile;
     private final String correctionsFile;
     private final TurkishWordValidator turkishWordValidator;
+    private Trie vocabularyTrie;
 
     private AhoCorasick<Rule> ahoCorasick;
     private List<Rule> allRules;
@@ -87,7 +89,7 @@ public final class Bootstrap {
         this.allRules = buildSortedRules();
         this.addOneCharRules = getAddOneCharRules(this.allRules); //bir karakter ekleme kuralları
         this.ahoCorasick =  buildAhoCorasick(this.allRules);
-
+        this.vocabularyTrie = buildVocabularyTrie();
     }
 
     private List<Rule> getAddOneCharRules(List<Rule> rules) {
@@ -126,6 +128,28 @@ public final class Bootstrap {
 
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
+    }
+    
+    public List<Candidate> findCandidates2(String misspelled)
+    {
+    	long start = System.currentTimeMillis();
+    	Iterator<SearchResult<Rule>> result = ahoCorasick.search(misspelled.toCharArray());
+    	
+    	Map<Character, List<Rule>> rulesAvailable = getAvailableRulesAsMap(result);
+
+    	//Sort rules
+    	Iterator<Map.Entry<Character, List<Rule>>> it = rulesAvailable.entrySet().iterator();
+    	while(it.hasNext())
+    	{
+    		Map.Entry<Character, List<Rule>> pairs = (Map.Entry<Character, List<Rule>>)it.next();
+    		Collections.sort((List<Rule>)pairs.getValue());
+    	}
+    	
+        List<CandidateWord> correctedWords = new ArrayList<CandidateWord>();
+        
+        this.findCorrectedWords2(rulesAvailable, 0, new CandidateWord(misspelled), correctedWords);
+    	
+    	return null; //TODO:
     }
 
     public List<Candidate> findCandidates(String misspelled) {
@@ -176,6 +200,22 @@ public final class Bootstrap {
         return rulesAvailable;
 
     }
+    
+    private Map<Character, List<Rule>> getAvailableRulesAsMap(Iterator<SearchResult<Rule>> result) {
+    	HashMap<Character, List<Rule>> rulesAvailable = new HashMap<Character, List<Rule>>();
+    	while(result.hasNext()){
+    		SearchResult<Rule> searchResult = result.next();
+    		for(Rule rule : searchResult.getOutputs()){
+    			char initialCharOfRule = rule.getBefore().charAt(0);
+    			if(!rulesAvailable.containsKey(initialCharOfRule))
+    			{
+    				rulesAvailable.put(initialCharOfRule, new ArrayList<Rule>());
+    			}
+    			rulesAvailable.get(initialCharOfRule).add(rule);
+    		}
+    	}
+    	return rulesAvailable;
+    }
 
     private AhoCorasick<Rule> buildAhoCorasick(List<Rule> rules) {
 
@@ -192,6 +232,32 @@ public final class Bootstrap {
         log("AhoCorasick (" + String.valueOf(rules.size()) + " rules) constructed in " + (System.currentTimeMillis() - start) + " millis");
 
         return ahoCorasick;
+
+    }
+    
+    private Trie buildVocabularyTrie() throws IOException {
+
+        long start = System.currentTimeMillis();
+
+        Trie trie = new Trie();
+
+        Locale trLocale = new Locale("tr", "TR");
+
+        List<String> lines = Util.readFile("data/model/tdk-stems.txt", Util.UTF8_ENCODING, true);
+
+        int i = 0;
+
+        for (String line : lines) {
+
+            line = line.trim().toLowerCase(trLocale);
+            trie.addWord(line);
+            i++;
+
+        }
+
+        System.out.println("Trie (" + String.valueOf(i) + " items) constructed in " + (System.currentTimeMillis() - start) + " millis");
+
+        return trie;
 
     }
 
@@ -267,6 +333,12 @@ public final class Bootstrap {
 
         return rules;
 
+    }
+    
+    private void findCorrectedWords2(Map<Character, List<Rule>> rulesAvailable, int depth, CandidateWord candidateWord, List<CandidateWord> correctedWords){
+    	depth++;
+    	
+    	//TODO: At first, find root candidates
     }
 
     private void findCorrectedWords(List<Rule> rulesAvailable, int depth, Candidate fromCandidate, List<Candidate> correctedWords){
