@@ -192,6 +192,7 @@ public final class Bootstrap {
             SearchResult<Rule> searchResult = result.next();
 
             for (Rule rule : searchResult.getOutputs()) {
+            	rule.setIndex(searchResult.getLastIndex() - rule.getBefore().length());
                 rulesAvailable.add(rule);
             }
 

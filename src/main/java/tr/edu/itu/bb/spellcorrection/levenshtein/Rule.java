@@ -11,6 +11,7 @@ public class Rule implements Comparable<Rule>{
     private String after;
     private double likelihood;
     private int count;
+    private int index;
 
     public Rule(String before, String after) {
         this.after = after;
@@ -35,6 +36,16 @@ public class Rule implements Comparable<Rule>{
 
     public int getCount() {
         return count;
+    }
+    
+    public int getIndex()
+    {
+    	return index;
+    }
+    
+    public void setIndex(int index)
+    {
+    	this.index = index;
     }
 
     public void setCount(int count) {
@@ -67,7 +78,8 @@ public class Rule implements Comparable<Rule>{
                 "before='" + before + '\'' +
                 ", after='" + after + '\'' +
                 ", likelihood=" + likelihood +
-                ", count=" + count+
+                ", count=" + count +
+                ", index=" + index +
                 "}";
     }
 
