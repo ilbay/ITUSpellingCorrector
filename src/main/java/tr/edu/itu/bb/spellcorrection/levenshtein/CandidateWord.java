@@ -20,27 +20,39 @@ public class CandidateWord {
     	this.totalWeight = 0;
     }
     
-    public boolean applyRule(int firstIndex, Rule rule)
+    public CandidateWord applyRule(Rule rule)
     {
+    	CandidateWord newCandidateWord = (CandidateWord)this.clone();
+
+    	newCandidateWord.appliedRules.add(rule);
+    	newCandidateWord.totalWeight += rule.getLikelihood();
+    	
+    	return newCandidateWord;
+    }
+    
+    public CandidateWord applyRule(int firstIndex, Rule rule)
+    {
+    	CandidateWord newCandidateWord = (CandidateWord)this.clone();
+    	
     	int lastIndex = firstIndex;
     	for(char c : rule.getBefore().toCharArray())
     	{
     		if(lastIndex >= this.candidateWord.length() || c != this.candidateWord.charAt(lastIndex))
-    			return false;
+    			return null;
     		lastIndex++;
     	}
 
     	if( lastIndex > this.candidateWord.length() ) {
-    		this.candidateWord = this.candidateWord.substring(0, firstIndex) + rule.getAfter();
+    		newCandidateWord.candidateWord = this.candidateWord.substring(0, firstIndex) + rule.getAfter();
     	}
     	else {
-    		this.candidateWord = this.candidateWord.substring(0, firstIndex) + rule.getAfter() + this.candidateWord.substring(lastIndex);
+    		newCandidateWord.candidateWord = this.candidateWord.substring(0, firstIndex) + rule.getAfter() + this.candidateWord.substring(lastIndex);
     	}
 
-    	this.appliedRules.add(rule);
-    	this.totalWeight += rule.getLikelihood();
+    	newCandidateWord.appliedRules.add(rule);
+    	newCandidateWord.totalWeight += rule.getLikelihood();
     	
-    	return true;
+    	return newCandidateWord;
     }
     
     @Override
