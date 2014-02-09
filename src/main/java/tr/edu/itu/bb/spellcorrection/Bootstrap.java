@@ -135,13 +135,14 @@ public final class Bootstrap {
     	long start = System.currentTimeMillis();
     	Iterator<SearchResult<Rule>> result = ahoCorasick.search(misspelled.toCharArray());
     	
-    	Map<Character, List<Rule>> rulesAvailable = getAvailableRulesAsMap(result);
+    	//Key=>Holds position where the rules must be applied to misspelled word
+    	Map<Byte, List<Rule>> rulesAvailable = getAvailableRulesAsMap(result);
 
     	//Sort rules
-    	Iterator<Map.Entry<Character, List<Rule>>> it = rulesAvailable.entrySet().iterator();
+    	Iterator<Map.Entry<Byte, List<Rule>>> it = rulesAvailable.entrySet().iterator();
     	while(it.hasNext())
     	{
-    		Map.Entry<Character, List<Rule>> pairs = (Map.Entry<Character, List<Rule>>)it.next();
+    		Map.Entry<Byte, List<Rule>> pairs = (Map.Entry<Byte, List<Rule>>)it.next();
     		Collections.sort((List<Rule>)pairs.getValue());
     	}
     	
@@ -202,17 +203,17 @@ public final class Bootstrap {
 
     }
     
-    private Map<Character, List<Rule>> getAvailableRulesAsMap(Iterator<SearchResult<Rule>> result) {
-    	HashMap<Character, List<Rule>> rulesAvailable = new HashMap<Character, List<Rule>>();
+    private Map<Byte, List<Rule>> getAvailableRulesAsMap(Iterator<SearchResult<Rule>> result) {
+    	HashMap<Byte, List<Rule>> rulesAvailable = new HashMap<Byte, List<Rule>>();
     	while(result.hasNext()){
     		SearchResult<Rule> searchResult = result.next();
     		for(Rule rule : searchResult.getOutputs()){
-    			char initialCharOfRule = rule.getBefore().charAt(0);
-    			if(!rulesAvailable.containsKey(initialCharOfRule))
+    			byte index = (byte)rule.getIndex();
+    			if(!rulesAvailable.containsKey(index))
     			{
-    				rulesAvailable.put(initialCharOfRule, new ArrayList<Rule>());
+    				rulesAvailable.put(index, new ArrayList<Rule>());
     			}
-    			rulesAvailable.get(initialCharOfRule).add(rule);
+    			rulesAvailable.get(index).add(rule);
     		}
     	}
     	return rulesAvailable;
@@ -336,7 +337,7 @@ public final class Bootstrap {
 
     }
     
-    private void findCorrectedWords2(Map<Character, List<Rule>> rulesAvailable, int depth, CandidateWord candidateWord, List<CandidateWord> correctedWords){
+    private void findCorrectedWords2(Map<Byte, List<Rule>> rulesAvailable, int depth, CandidateWord candidateWord, List<CandidateWord> correctedWords){
     	depth++;
     	
     	//TODO: At first, find root candidates
