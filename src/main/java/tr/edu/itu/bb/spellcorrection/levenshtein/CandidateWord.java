@@ -3,7 +3,7 @@ package tr.edu.itu.bb.spellcorrection.levenshtein;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CandidateWord {
+public class CandidateWord implements Comparable<CandidateWord>{
     private String candidateWord;
     private double totalWeight;
     private List<Rule> appliedRules;
@@ -18,6 +18,27 @@ public class CandidateWord {
     	this.candidateWord = candidateWord;
     	this.appliedRules = new ArrayList<Rule>();
     	this.totalWeight = 0;
+    }
+    
+    public CandidateWord buildCandidateWord()
+    {
+    	CandidateWord newCandidateWord = (CandidateWord)this.clone();
+    	int changeInIndex = 0;
+    	String initialString = "";
+    	for(Rule rule : this.appliedRules)
+    	{
+        	try
+        	{
+        		initialString = newCandidateWord.candidateWord.substring(0, rule.getIndex()+changeInIndex);
+        	}
+        	catch(IndexOutOfBoundsException ex)
+        	{
+        		initialString = "";
+        	}
+    		newCandidateWord.candidateWord = initialString + rule.getAfter() + newCandidateWord.candidateWord.substring(rule.getBefore().length()+changeInIndex);
+    		changeInIndex += (rule.getAfter().length() - rule.getBefore().length());
+    	}
+    	return newCandidateWord;
     }
     
     public CandidateWord applyRule(Rule rule)
@@ -99,4 +120,16 @@ public class CandidateWord {
     {
     	return this.totalWeight;
     }
+    
+    @Override
+    public boolean equals(Object o)
+    {
+    	CandidateWord cw = (CandidateWord)o;
+    	return cw.candidateWord.equals(this.candidateWord) && this.totalWeight == cw.totalWeight;
+    }
+
+	@Override
+	public int compareTo(CandidateWord o) {
+		return (int)Math.signum(o.totalWeight - this.totalWeight);
+	}
 }
