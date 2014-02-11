@@ -35,7 +35,7 @@ public class CandidateWord implements Comparable<CandidateWord>{
         	{
         		initialString = "";
         	}
-    		newCandidateWord.candidateWord = initialString + rule.getAfter() + newCandidateWord.candidateWord.substring(rule.getBefore().length()+changeInIndex);
+    		newCandidateWord.candidateWord = initialString + rule.getAfter() + newCandidateWord.candidateWord.substring(rule.getIndex()+rule.getBefore().length()+changeInIndex);
     		changeInIndex += (rule.getAfter().length() - rule.getBefore().length());
     	}
     	return newCandidateWord;

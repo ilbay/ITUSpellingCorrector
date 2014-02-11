@@ -71,6 +71,15 @@ public class Rule implements Comparable<Rule>{
         result = 31 * result + after.hashCode();
         return result;
     }
+    
+    public Object clone()
+    {
+    	Rule rule = new Rule(this.before,this.after);
+    	rule.likelihood = this.likelihood;
+    	rule.index = this.index;
+    	rule.count = this.count;
+    	return rule;
+    }
 
     @Override
     public String toString() {

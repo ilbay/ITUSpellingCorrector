@@ -51,21 +51,26 @@ public class CandidateSearcher {
 			int currentIndex = currentDecisionPoint.getIndex();
 			Node currentNode = currentDecisionPoint.getNode();
 			
-			if(decisionPointSet.get(currentNode) != currentDecisionPoint)
+			if(currentIndex >= currentCandidateWord.getCandidateWord().length() || (decisionPointSet.get(currentNode) != null && decisionPointSet.get(currentNode) != currentDecisionPoint))
 			{
 				continue;
 			}
 			
 			if(currentNode.getSubNode(currentCandidateWord.getCandidateWord().charAt(currentIndex)) != null)
 			{
-				DecisionPoint newDecisionPoint = new DecisionPoint(currentCandidateWord, currentIndex+1, currentNode.getSubNode(currentCandidateWord.getCandidateWord().charAt(currentIndex)));
+				Node nextNode = currentNode.getSubNode(currentCandidateWord.getCandidateWord().charAt(currentIndex));
+				DecisionPoint newDecisionPoint = new DecisionPoint(currentCandidateWord, currentIndex+1, nextNode);
 				if(this.putNewDecisionPoint(newDecisionPoint, decisionPointSet))
 				{
 					decisionPointStack.add(newDecisionPoint);
 				}
+				if(nextNode.getOutput()!=null && !nextNode.getOutput().equals(""))
+				{
+					candidateList.add(currentCandidateWord.buildCandidateWord());
+				}
 			}
 			
-			List<Rule> rules = this.rulesAvailable.get(currentIndex);
+			List<Rule> rules = this.rulesAvailable.get((byte)currentIndex);
 			if(rules == null)
 			{
 				continue;
@@ -76,7 +81,7 @@ public class CandidateSearcher {
 				CandidateWord newCandidateWord = currentCandidateWord.applyRule(rule);
 				if( candidateList.size() >= maxCandidate && candidateList.first().getTotalWeight() > newCandidateWord.getTotalWeight())
 				{
-					break;
+					//break;
 				}
 				try
 				{
@@ -85,11 +90,11 @@ public class CandidateSearcher {
 					{
 						newCandidateCurrentNode = newCandidateCurrentNode.getSubNode(c);
 					}
-					if(!newCandidateCurrentNode.getOutput().equals(""))
+					if(newCandidateCurrentNode.getOutput() != null && !newCandidateCurrentNode.getOutput().equals(""))
 					{
 						if(candidateList.size() == maxCandidate)
 						{
-							candidateList.remove(candidateList.first());
+							//candidateList.remove(candidateList.first());
 						}
 						candidateList.add(newCandidateWord.buildCandidateWord());
 					}
