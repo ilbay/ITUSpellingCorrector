@@ -1,6 +1,7 @@
 package tr.edu.itu.bb.spellcorrection.trie;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.TreeSet;
 
 import tr.edu.itu.bb.spellcorrection.levenshtein.CandidateWord;
 import tr.edu.itu.bb.spellcorrection.levenshtein.Rule;
+import tr.edu.itu.bb.spellcorrection.levenshtein.WordInformation;
 
 public class CandidateSearcher {
 
@@ -25,9 +27,9 @@ public class CandidateSearcher {
 		this.vocabularyTrie = vocabularyTrie;
 	}
 	
-	public TreeSet<CandidateWord> buildCandidateList(int maxCandidate)
+	public List<WordInformation> buildCandidateList(int maxCandidate)
 	{
-		TreeSet<CandidateWord> candidateList = new TreeSet<>();
+		List<WordInformation> candidateList = new ArrayList<>();
 		Node rootNode = this.vocabularyTrie.getRootNode();
 		
 		Stack<DecisionPoint> decisionPointStack = new Stack<>();
@@ -66,7 +68,7 @@ public class CandidateSearcher {
 				}
 				if(nextNode.getOutput()!=null && !nextNode.getOutput().equals(""))
 				{
-					candidateList.add(currentCandidateWord.buildCandidateWord());
+					candidateList.add(new WordInformation(nextNode.getOutput(), currentCandidateWord.getCandidateWord().substring(currentIndex+1), currentCandidateWord.getTotalWeight(), currentIndex+1));
 				}
 			}
 			
@@ -79,10 +81,10 @@ public class CandidateSearcher {
 			for(Rule rule : rules)
 			{
 				CandidateWord newCandidateWord = currentCandidateWord.applyRule(rule);
-				if( candidateList.size() >= maxCandidate && candidateList.first().getTotalWeight() > newCandidateWord.getTotalWeight())
-				{
+				//if( candidateList.size() >= maxCandidate && candidateList.first().getTotalWeight() > newCandidateWord.getTotalWeight())
+				//{
 					//break;
-				}
+				//}
 				try
 				{
 					Node newCandidateCurrentNode = currentNode;
@@ -96,7 +98,7 @@ public class CandidateSearcher {
 						{
 							//candidateList.remove(candidateList.first());
 						}
-						candidateList.add(newCandidateWord.buildCandidateWord());
+						candidateList.add(new WordInformation(newCandidateCurrentNode.getOutput(), newCandidateWord.getCandidateWord().substring(currentIndex+rule.getBefore().length()), newCandidateWord.getTotalWeight(), currentIndex+rule.getBefore().length()));
 					}
 					if(newCandidateCurrentNode != null) //TODO: This control seems not necessary
 					{
@@ -114,7 +116,9 @@ public class CandidateSearcher {
 				}
 			}
 		}
-
+		
+		Collections.sort(candidateList);
+		
 		return candidateList;
 	}
 	

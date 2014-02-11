@@ -10,7 +10,6 @@ public class CandidateWord implements Comparable<CandidateWord>{
     
     protected CandidateWord()
     {
-    	
     }
     
     public CandidateWord(String candidateWord)

@@ -46,6 +46,7 @@ public class ItuNlpTools {
 
     public List<Candidate> execute(String input){
     	//System.out.println( "execute( " + input + " )" );
+    	bootstrap.findCandidates2(input);
         return bootstrap.findCandidates(input);
     }
 

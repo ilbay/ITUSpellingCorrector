@@ -10,6 +10,9 @@ import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
 import com.googlecode.concurrenttrees.radix.node.util.PrettyPrintable;
 import com.googlecode.concurrenttrees.suffix.ConcurrentSuffixTree;
 import com.googlecode.concurrenttrees.suffix.SuffixTree;
+
+import tr.edu.itu.bb.spellcorrection.ahocorasick.AhoCorasick;
+import tr.edu.itu.bb.spellcorrection.levenshtein.Rule;
 import tr.edu.itu.bb.spellcorrection.suffixtree.PairedResponse;
 import tr.edu.itu.bb.spellcorrection.util.CharacterUtil;
 import tr.edu.itu.bb.spellcorrection.util.Util;
@@ -36,6 +39,11 @@ public class Trie {
 
     public void addWord(String word) {
         rootNode.expandNode(word.toCharArray());
+    }
+    
+    public Node getRootNode()
+    {
+    	return this.rootNode;
     }
 
     public List<String> getOutputs(String word) {
@@ -122,6 +130,12 @@ public class Trie {
     		}
     	}
 
+    	return rootWords;
+    }
+    
+    public List<Word> getRootWords(String misspelledWord, AhoCorasick<Rule> rules)
+    {
+    	ArrayList<Word> rootWords = new ArrayList<Word>();
     	return rootWords;
     }
 

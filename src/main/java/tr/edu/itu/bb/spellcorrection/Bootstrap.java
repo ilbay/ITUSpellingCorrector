@@ -3,6 +3,7 @@ package tr.edu.itu.bb.spellcorrection;
 import tr.edu.itu.bb.spellcorrection.ahocorasick.AhoCorasick;
 import tr.edu.itu.bb.spellcorrection.ahocorasick.SearchResult;
 import tr.edu.itu.bb.spellcorrection.levenshtein.*;
+import tr.edu.itu.bb.spellcorrection.trie.CandidateSearcher;
 import tr.edu.itu.bb.spellcorrection.trie.Trie;
 import tr.edu.itu.bb.spellcorrection.util.CharacterUtil;
 import tr.edu.itu.bb.spellcorrection.util.NotMisspelledWordException;
@@ -148,9 +149,9 @@ public final class Bootstrap {
     	
         List<CandidateWord> correctedWords = new ArrayList<CandidateWord>();
         
-        this.findCorrectedWords2(rulesAvailable, 0, new CandidateWord(misspelled), correctedWords);
+        this.findCorrectedWords2(rulesAvailable, 10, new CandidateWord(misspelled), correctedWords);
     	
-    	return null; //TODO:
+    	return null;
     }
 
     public List<Candidate> findCandidates(String misspelled) {
@@ -173,6 +174,8 @@ public final class Bootstrap {
         List<Candidate> correctedWords = new ArrayList<Candidate>();
         
         findCorrectedWords(rulesAvailable, 0, Candidate.fromMisspelled(misspelled), correctedWords);
+        
+        System.out.println(isTurkishRequestCount);
 
         log("Correction finished in " + (System.currentTimeMillis() - start) + " millis");
         
@@ -208,12 +211,14 @@ public final class Bootstrap {
     	while(result.hasNext()){
     		SearchResult<Rule> searchResult = result.next();
     		for(Rule rule : searchResult.getOutputs()){
-    			byte index = (byte)rule.getIndex();
+    			byte index = (byte)(searchResult.getLastIndex()-rule.getBefore().length());
+    			Rule updatedRule = (Rule)rule.clone();
+    			updatedRule.setIndex(index);
     			if(!rulesAvailable.containsKey(index))
     			{
     				rulesAvailable.put(index, new ArrayList<Rule>());
     			}
-    			rulesAvailable.get(index).add(rule);
+    			rulesAvailable.get(index).add(updatedRule);
     		}
     	}
     	return rulesAvailable;
@@ -338,15 +343,83 @@ public final class Bootstrap {
     }
     
     private void findCorrectedWords2(Map<Byte, List<Rule>> rulesAvailable, int depth, CandidateWord candidateWord, List<CandidateWord> correctedWords){
-    	depth++;
-    	
-    	//TODO: At first, find root candidates
+        
+    	/**
+    	 * Finds root candidates
+    	 */
+    	CandidateSearcher searcher = new CandidateSearcher(candidateWord, this.vocabularyTrie, rulesAvailable);
+        List<WordInformation> candidateWordList = searcher.buildCandidateList(10);
+        System.out.println("Root Candidate Size: " + candidateWordList.size());
+        
+        TreeSet<CorrectedWord> correctedWordSet = new TreeSet<>();
+        
+        for(WordInformation word : candidateWordList)
+        {
+        	String suffix = word.getSuffix();
+        	int rootLength = candidateWord.getCandidateWord().length() - suffix.length();
+        	if(word.getSuffix().equals(""))
+        	{
+    			if((depth == correctedWordSet.size() && correctedWordSet.first().getTotalWeight() < word.getTotalWeight()) || depth > correctedWordSet.size())
+    			{
+    				if(isTurkish(word.getRoot()))
+    				{
+    					if(depth == correctedWordSet.size())
+    						correctedWordSet.remove(correctedWordSet.first());
+        				correctedWordSet.add(new CorrectedWord(word.getRoot(), word.getTotalWeight()));
+    				}
+    			}
+    			else
+    			{
+    				break;
+    			}
+        	}
+        	
+        	for(int i = word.getIndex(); i < suffix.length(); i++)
+        	{
+        		List<Rule> ruleList = rulesAvailable.get((byte)i);
+    			int index = i - rootLength;
+    			
+        		for(Rule rule : ruleList)
+        		{
+        			String newSuffix = "";
+        			try
+        			{
+        				newSuffix = suffix.substring(0, index) + rule.getAfter() + suffix.substring(index + rule.getBefore().length());
+        			}
+        			catch(java.lang.StringIndexOutOfBoundsException e)
+        			{
+        				e.printStackTrace();
+        			}
+        			String newWord = word.getRoot() + newSuffix;
+        			double newTotalWeight = word.getTotalWeight() + rule.getLikelihood();
+        			if((depth == correctedWordSet.size() && correctedWordSet.first().getTotalWeight() < newTotalWeight) || depth > correctedWordSet.size())
+        			{
+        				if(isTurkish(newWord))
+        				{
+        					if(depth == correctedWordSet.size())
+        						correctedWordSet.remove(correctedWordSet.first());
+            				correctedWordSet.add(new CorrectedWord(newWord, newTotalWeight));
+        				}
+        			}
+        			else
+        			{
+        				break;
+        			}
+        		}
+        	}
+        	
+        }
+        
+        for(CorrectedWord cw : correctedWordSet)
+        {
+        	System.out.println(cw);
+        }
     }
 
     private void findCorrectedWords(List<Rule> rulesAvailable, int depth, Candidate fromCandidate, List<Candidate> correctedWords){
 
         depth++;
-
+        
         for (Rule rule : rulesAvailable) {
 
             List<Candidate> candidates = fromCandidate.buildCandidates(rule);
