@@ -39,6 +39,6 @@ public class CorrectedWord implements Comparable<CorrectedWord>{
 
 	@Override
 	public int compareTo(CorrectedWord o) {
-		return (int)Math.signum(o.totalWeight - this.totalWeight);
+		return (int)Math.signum(this.totalWeight - o.totalWeight);
 	}
 }

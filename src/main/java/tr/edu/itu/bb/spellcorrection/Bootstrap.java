@@ -131,7 +131,7 @@ public final class Bootstrap {
         this.verbose = verbose;
     }
     
-    public List<Candidate> findCandidates2(String misspelled)
+    public String findCandidates2(String misspelled)
     {
     	long start = System.currentTimeMillis();
     	Iterator<SearchResult<Rule>> result = ahoCorasick.search(misspelled.toCharArray());
@@ -149,9 +149,9 @@ public final class Bootstrap {
     	
         List<CandidateWord> correctedWords = new ArrayList<CandidateWord>();
         
-        this.findCorrectedWords2(rulesAvailable, 10, new CandidateWord(misspelled), correctedWords);
+        TreeSet<CorrectedWord> candidateList = this.findCorrectedWords2(rulesAvailable, 10, new CandidateWord(misspelled), correctedWords);
     	
-    	return null;
+    	return candidateList.last().getWord();
     }
 
     public List<Candidate> findCandidates(String misspelled) {
@@ -342,7 +342,7 @@ public final class Bootstrap {
 
     }
     
-    private void findCorrectedWords2(Map<Byte, List<Rule>> rulesAvailable, int depth, CandidateWord candidateWord, List<CandidateWord> correctedWords){
+    private TreeSet<CorrectedWord> findCorrectedWords2(Map<Byte, List<Rule>> rulesAvailable, int depth, CandidateWord candidateWord, List<CandidateWord> correctedWords){
         
     	/**
     	 * Finds root candidates
@@ -414,11 +414,8 @@ public final class Bootstrap {
         	}
         	
         }
-        
-        for(CorrectedWord cw : correctedWordSet)
-        {
-        	System.out.println(cw);
-        }
+                
+        return correctedWordSet;
     }
 
     private void findCorrectedWords(List<Rule> rulesAvailable, int depth, Candidate fromCandidate, List<Candidate> correctedWords){
