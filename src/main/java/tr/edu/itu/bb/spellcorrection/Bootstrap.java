@@ -379,6 +379,11 @@ public final class Bootstrap {
         		List<Rule> ruleList = rulesAvailable.get((byte)i);
     			int index = i - rootLength;
     			
+    			if(ruleList == null)
+    			{
+    				continue;
+    			}
+    			
         		for(Rule rule : ruleList)
         		{
         			String newSuffix = "";

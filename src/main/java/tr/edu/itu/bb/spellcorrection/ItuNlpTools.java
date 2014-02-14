@@ -47,16 +47,17 @@ public class ItuNlpTools {
     public List<Candidate> execute(String input){
     	//System.out.println( "execute( " + input + " )" );
     	bootstrap.findCandidates2(input);
-        return bootstrap.findCandidates(input);
+        return null;
+    	//return bootstrap.findCandidates(input);
     }
 
     public static void main(String[] args) throws Exception {
       //  System.out.println(new ItuNlpTools().execute("arba"));
     	
     	
-    
+    	System.out.println(ItuNlpTools.getInstance().execute("ev#de"));
         System.out.println(ItuNlpTools.getInstance().execute("unurmak"));
-    		//MorphologicalAnalyzerServiceHandler.getInstance().isTurkish( "az+rab" );
+        //MorphologicalAnalyzerServiceHandler.getInstance().isTurkish( "azm+rab" );
     	
     }
 }

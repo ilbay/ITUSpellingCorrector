@@ -5773,3 +5773,4 @@ Acitasyonla=>Ajitasyonla
 biliyosun=>biliyorsun
 pisliksinSana=>pisliksin Sana
 nezaman=>ne zaman
+arkalaş=>arkadaş
