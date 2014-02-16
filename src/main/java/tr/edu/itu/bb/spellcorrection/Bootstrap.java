@@ -134,10 +134,19 @@ public final class Bootstrap {
     public String findCandidates2(String misspelled)
     {
     	long start = System.currentTimeMillis();
-    	Iterator<SearchResult<Rule>> result = ahoCorasick.search(misspelled.toCharArray());
     	
+    	Iterator<SearchResult<Rule>> result = null;
+    	Map<Byte, List<Rule>> rulesAvailable = null;
+    	try
+    	{
+    		result = ahoCorasick.search(misspelled.toCharArray());
+        	rulesAvailable = getAvailableRulesAsMap(result);
+    	}
+    	catch(IllegalArgumentException ex)
+    	{
+    		return misspelled;
+    	}
     	//Key=>Holds position where the rules must be applied to misspelled word
-    	Map<Byte, List<Rule>> rulesAvailable = getAvailableRulesAsMap(result);
 
     	//Sort rules
     	Iterator<Map.Entry<Byte, List<Rule>>> it = rulesAvailable.entrySet().iterator();
@@ -151,6 +160,22 @@ public final class Bootstrap {
         
         TreeSet<CorrectedWord> candidateList = this.findCorrectedWords2(rulesAvailable, 10, new CandidateWord(misspelled), correctedWords);
     	
+        if(candidateList.size() == 0)
+        {
+        	int index = 1;
+        	while(index < misspelled.length())
+        	{
+        		String w = misspelled.substring(0, index) + " " + misspelled.substring(index);
+        		if(isTurkish(misspelled.substring(0, index)) && isTurkish(misspelled.substring(index)))
+        		{
+        			return w;
+        		}
+        		
+        		index=(index == 1 ? 2 : index+2);
+        	}
+        	return misspelled;
+        }
+        
     	return candidateList.last().getWord();
     }
 
@@ -349,7 +374,6 @@ public final class Bootstrap {
     	 */
     	CandidateSearcher searcher = new CandidateSearcher(candidateWord, this.vocabularyTrie, rulesAvailable);
         List<WordInformation> candidateWordList = searcher.buildCandidateList(10);
-        System.out.println("Root Candidate Size: " + candidateWordList.size());
         
         TreeSet<CorrectedWord> correctedWordSet = new TreeSet<>();
         
