@@ -13,7 +13,7 @@ import java.util.List;
 public class ItuNlpTools {
 
     private static final String CHAR_FILE = "data/model/characters.txt";
-    private static final String TRAINING_FILE = "data/model/training-bigdata-unique-1";
+    private static final String TRAINING_FILE = "data/model/TotalTrainingData-unique.txt";
     private static final Bootstrap.TurkishValidator TURKISH_VALIDATOR = Bootstrap.TurkishValidator.ItuNlpTools;
 
     private static final int DEFAULT_CANDIDATE_SIZE = 3;
@@ -45,22 +45,11 @@ public class ItuNlpTools {
     	return instance;
     }
 
-    public List<Candidate> execute(String input){
-    	//System.out.println( "execute( " + input + " )" );
-    	System.out.println(bootstrap.findCandidates(input));
-        return null;
-    	//return bootstrap.findCandidates(input);
-    }
-    
-    public String executeAsString(String input)
-    {
+    public String execute(String input){
     	return bootstrap.findCandidates(input);
     }
-
+    
     public static void main(String[] args) throws Exception {
-      //  System.out.println(new ItuNlpTools().execute("arba"));
-    	
         System.out.println(ItuNlpTools.getInstance().execute("unurmak"));
-        //MorphologicalAnalyzerServiceHandler.getInstance().isTurkish( "azm+rab" );
     }
 }

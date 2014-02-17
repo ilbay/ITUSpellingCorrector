@@ -37,7 +37,7 @@ public final class Bootstrap {
     private final String correctionsFile;
     private final TurkishWordValidator turkishWordValidator;
     private Trie vocabularyTrie;
-    private boolean TRAIN = false;
+    private boolean TRAIN = true;
 
     private AhoCorasick<Rule> ahoCorasick;
     private List<Rule> allRules;
