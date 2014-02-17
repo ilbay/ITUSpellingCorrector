@@ -3,118 +3,83 @@ package tr.edu.itu.bb.spellcorrection.levenshtein;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * User: eren
- * Date: 5/6/13
- * Time: 1:16 AM
- */
-public final class Candidate implements Comparable<Candidate>{
-
+public class Candidate implements Comparable<Candidate>{
     private String candidateWord;
     private double totalWeight;
     private List<Rule> appliedRules;
-    private boolean normalized;
-
-    private Candidate() {
+    
+    protected Candidate()
+    {
     }
-
-    private Candidate(String candidateWord) {
-
-        this.appliedRules = new ArrayList<Rule>();
-        this.candidateWord = candidateWord;
-
+    
+    public Candidate(String candidateWord)
+    {
+    	this.candidateWord = candidateWord;
+    	this.appliedRules = new ArrayList<Rule>();
+    	this.totalWeight = 0;
     }
-
-    public static Candidate fromMisspelled(String misspelledWord) {
-        return new Candidate(misspelledWord);
+    
+    public Candidate buildCandidateWord()
+    {
+    	Candidate newCandidateWord = (Candidate)this.clone();
+    	int changeInIndex = 0;
+    	String initialString = "";
+    	for(Rule rule : this.appliedRules)
+    	{
+        	try
+        	{
+        		initialString = newCandidateWord.candidateWord.substring(0, rule.getIndex()+changeInIndex);
+        	}
+        	catch(IndexOutOfBoundsException ex)
+        	{
+        		initialString = "";
+        	}
+    		newCandidateWord.candidateWord = initialString + rule.getAfter() + newCandidateWord.candidateWord.substring(rule.getIndex()+rule.getBefore().length()+changeInIndex);
+    		changeInIndex += (rule.getAfter().length() - rule.getBefore().length());
+    	}
+    	return newCandidateWord;
     }
+    
+    public Candidate applyRule(Rule rule)
+    {
+    	Candidate newCandidateWord = (Candidate)this.clone();
 
-    public static List<Candidate> buildCandidates(String normalized){
-
-        List<Candidate> candidates = new ArrayList<Candidate>();
-
-        candidates.add(new Candidate(normalized));
-
-        return candidates;
+    	newCandidateWord.appliedRules.add(rule);
+    	newCandidateWord.totalWeight += rule.getLikelihood();
+    	
+    	return newCandidateWord;
     }
+    
+    public Candidate applyRule(int firstIndex, Rule rule)
+    {
+    	Candidate newCandidateWord = (Candidate)this.clone();
+    	
+    	int lastIndex = firstIndex;
+    	for(char c : rule.getBefore().toCharArray())
+    	{
+    		if(lastIndex >= this.candidateWord.length() || c != this.candidateWord.charAt(lastIndex))
+    			return null;
+    		lastIndex++;
+    	}
 
-    public List<Candidate> buildCandidates(Rule anotherRule){ //kadar'a a->e uygularsan kedar da olabilir, kader de. hepsi donmeli
+    	if( lastIndex > this.candidateWord.length() ) {
+    		newCandidateWord.candidateWord = this.candidateWord.substring(0, firstIndex) + rule.getAfter();
+    	}
+    	else {
+    		newCandidateWord.candidateWord = this.candidateWord.substring(0, firstIndex) + rule.getAfter() + this.candidateWord.substring(lastIndex);
+    	}
 
-        int indexOf = 0;
-        int beforeLength = anotherRule.getBefore().length();
-
-        List<Candidate> candidates = new ArrayList<Candidate>();
-
-        boolean first = true;
-
-        do{
-
-            if(first){
-                indexOf = this.candidateWord.indexOf(anotherRule.getBefore(), indexOf);
-                first = false;
-            } else {
-                indexOf = this.candidateWord.indexOf(anotherRule.getBefore(), indexOf + 1);
-            }
-
-            if(indexOf != -1){
-
-                Candidate candidate = new Candidate();
-
-                candidate.appliedRules = new ArrayList<Rule>();
-
-                for (Rule appliedRule : this.appliedRules) {
-                    candidate.appliedRules.add(appliedRule);
-                }
-                candidate.appliedRules.add(anotherRule);
-
-                candidate.totalWeight = this.totalWeight + anotherRule.getLikelihood();
-
-                candidate.candidateWord = candidateWord.substring(0, indexOf) + anotherRule.getAfter() + candidateWord.substring(indexOf + beforeLength);
-
-                candidates.add(candidate);
-
-            }
-
-        } while(indexOf != -1 && indexOf != candidateWord.length());
-
-        return candidates;
-
+    	newCandidateWord.appliedRules.add(rule);
+    	newCandidateWord.totalWeight += rule.getLikelihood();
+    	
+    	return newCandidateWord;
     }
-
-    public String getCandidateWord() {
-        return candidateWord;
-    }
-
-    public double getTotalWeight() {
-        return totalWeight;
-    }
-
-    public void setTotalWeight(double totalWeight) {
-        this.totalWeight = totalWeight;
-    }
-
-    public List<Rule> getAppliedRules() {
-        return appliedRules;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Candidate candidate = (Candidate) o;
-
-        if (candidateWord != null ? !candidateWord.equals(candidate.candidateWord) : candidate.candidateWord != null)
-            return false;
-
-        return true;
-    }
-
+    
     @Override
     public int hashCode() {
         return candidateWord != null ? candidateWord.hashCode() : 0;
     }
-
+    
     @Override
     public String toString() {
         return "Candidate{" +
@@ -123,9 +88,47 @@ public final class Candidate implements Comparable<Candidate>{
                 ", appliedRules=" + appliedRules +
                 "}";
     }
+    
+    public Object clone()
+    {
+    	Candidate cw = new Candidate();
+    	
+    	cw.candidateWord = this.candidateWord;
+    	cw.appliedRules = new ArrayList<Rule>();
+    	cw.totalWeight = this.totalWeight;
 
-    @Override
-    public int compareTo(Candidate o) {
-        return Double.valueOf(o.getTotalWeight()).compareTo(this.getTotalWeight());
+    	for(Rule rule : this.appliedRules)
+    	{
+    		cw.appliedRules.add(rule);
+    	}
+    	
+    	return cw;
     }
+    
+    public List<Rule> getAppliedRules()
+    {
+    	return this.appliedRules;
+    }
+    
+    public String getCandidateWord()
+    {
+    	return this.candidateWord;
+    }
+    
+    public double getTotalWeight()
+    {
+    	return this.totalWeight;
+    }
+    
+    @Override
+    public boolean equals(Object o)
+    {
+    	Candidate cw = (Candidate)o;
+    	return cw.candidateWord.equals(this.candidateWord) && this.totalWeight == cw.totalWeight;
+    }
+
+	@Override
+	public int compareTo(Candidate o) {
+		return (int)Math.signum(o.totalWeight - this.totalWeight);
+	}
 }

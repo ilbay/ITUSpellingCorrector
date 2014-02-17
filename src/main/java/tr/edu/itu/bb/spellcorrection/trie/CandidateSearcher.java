@@ -10,17 +10,17 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
-import tr.edu.itu.bb.spellcorrection.levenshtein.CandidateWord;
+import tr.edu.itu.bb.spellcorrection.levenshtein.Candidate;
 import tr.edu.itu.bb.spellcorrection.levenshtein.Rule;
 import tr.edu.itu.bb.spellcorrection.levenshtein.WordInformation;
 
 public class CandidateSearcher {
 
-	private CandidateWord word;
+	private Candidate word;
 	private Map<Byte, List<Rule>> rulesAvailable;
 	private Trie vocabularyTrie;
 
-	public CandidateSearcher(CandidateWord word, Trie vocabularyTrie, Map<Byte, List<Rule>> rulesAvailable)
+	public CandidateSearcher(Candidate word, Trie vocabularyTrie, Map<Byte, List<Rule>> rulesAvailable)
 	{
 		this.word = word;
 		this.rulesAvailable = rulesAvailable;
@@ -49,7 +49,7 @@ public class CandidateSearcher {
 		{
 			DecisionPoint currentDecisionPoint = decisionPointStack.pop();
 			
-			CandidateWord currentCandidateWord = currentDecisionPoint.getCandidateWord();
+			Candidate currentCandidateWord = currentDecisionPoint.getCandidateWord();
 			int currentIndex = currentDecisionPoint.getIndex();
 			Node currentNode = currentDecisionPoint.getNode();
 			
@@ -80,7 +80,7 @@ public class CandidateSearcher {
 			
 			for(Rule rule : rules)
 			{
-				CandidateWord newCandidateWord = currentCandidateWord.applyRule(rule);
+				Candidate newCandidateWord = currentCandidateWord.applyRule(rule);
 				//if( candidateList.size() >= maxCandidate && candidateList.first().getTotalWeight() > newCandidateWord.getTotalWeight())
 				//{
 					//break;
@@ -137,9 +137,9 @@ public class CandidateSearcher {
 	private class DecisionPoint{
 		private Node node;
 		private int index;
-		private CandidateWord candidateWord;
+		private Candidate candidateWord;
 		
-		public DecisionPoint(CandidateWord candidateWord, int index, Node node)
+		public DecisionPoint(Candidate candidateWord, int index, Node node)
 		{
 			this.candidateWord = candidateWord;
 			this.index = index;
@@ -173,11 +173,11 @@ public class CandidateSearcher {
 			this.index = index;
 		}
 
-		public CandidateWord getCandidateWord() {
+		public Candidate getCandidateWord() {
 			return candidateWord;
 		}
 
-		public void setCandidateWord(CandidateWord candidateWord) {
+		public void setCandidateWord(Candidate candidateWord) {
 			this.candidateWord = candidateWord;
 		}
 	}
