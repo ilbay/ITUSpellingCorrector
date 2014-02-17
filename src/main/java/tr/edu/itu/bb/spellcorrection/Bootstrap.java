@@ -13,7 +13,12 @@ import tr.edu.itu.bb.spellcorrection.validators.ItuNlpToolsTurkishWordValidator;
 import tr.edu.itu.bb.spellcorrection.validators.TurkishWordValidator;
 import tr.edu.itu.bb.spellcorrection.validators.ZemberekTurkishWordValidator;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.*;
 
 /**
@@ -32,10 +37,10 @@ public final class Bootstrap {
     private final String correctionsFile;
     private final TurkishWordValidator turkishWordValidator;
     private Trie vocabularyTrie;
+    private boolean TRAIN = false;
 
     private AhoCorasick<Rule> ahoCorasick;
     private List<Rule> allRules;
-    private List<Rule> addOneCharRules;
 
     private boolean verbose;
     private long isTurkishRequestCount = 0;
@@ -86,27 +91,37 @@ public final class Bootstrap {
     }
 
     public void init() throws Exception {
-
-        this.allRules = buildSortedRules();
-        this.addOneCharRules = getAddOneCharRules(this.allRules); //bir karakter ekleme kuralları
-        this.ahoCorasick =  buildAhoCorasick(this.allRules);
-        this.vocabularyTrie = buildVocabularyTrie();
-    }
-
-    private List<Rule> getAddOneCharRules(List<Rule> rules) {
-
-        List<Rule> addOneCharRules = new ArrayList<Rule>();
-
-        for (Rule rule : rules) {
-
-            if(rule.getBefore().equals("")){
-                addOneCharRules.add(rule);
-            }
-
+        File ahoCorasickTrieFile = new File("data/model/AhoCorasickTrie.dat");
+        if(this.TRAIN || !ahoCorasickTrieFile.exists() || ahoCorasickTrieFile.isDirectory())
+        {
+            this.allRules = buildSortedRules();
+            this.ahoCorasick =  buildAhoCorasick(this.allRules);
+        	FileOutputStream fileOut = new FileOutputStream(ahoCorasickTrieFile);
+        	ObjectOutputStream out = new ObjectOutputStream(fileOut);
+        	out.writeObject(this.ahoCorasick);         
+        }
+        else
+        {
+        	FileInputStream fileIn = new FileInputStream(ahoCorasickTrieFile);
+        	ObjectInputStream in = new ObjectInputStream(fileIn);
+        	this.ahoCorasick = (AhoCorasick<Rule>)in.readObject();
         }
 
-        return addOneCharRules;
-
+        File vocabulayTrieFile = new File("data/model/VocabularyTrie.dat");
+        if(this.TRAIN || !vocabulayTrieFile.exists() || vocabulayTrieFile.isDirectory())
+        {
+        	this.vocabularyTrie = buildVocabularyTrie();
+        	FileOutputStream fileOut = new FileOutputStream(vocabulayTrieFile);
+        	ObjectOutputStream out = new ObjectOutputStream(fileOut);
+        	out.writeObject(this.vocabularyTrie);
+        }
+        else
+        {
+        	FileInputStream fileIn = new FileInputStream(vocabulayTrieFile);
+        	ObjectInputStream in = new ObjectInputStream(fileIn);
+        	this.vocabularyTrie = (Trie)in.readObject();
+        }
+        
     }
 
     public boolean isTurkish(String word){
@@ -131,7 +146,7 @@ public final class Bootstrap {
         this.verbose = verbose;
     }
     
-    public String findCandidates2(String misspelled)
+    public String findCandidates(String misspelled)
     {
     	long start = System.currentTimeMillis();
     	
@@ -158,7 +173,7 @@ public final class Bootstrap {
     	
         List<CandidateWord> correctedWords = new ArrayList<CandidateWord>();
         
-        TreeSet<CorrectedWord> candidateList = this.findCorrectedWords2(rulesAvailable, 10, new CandidateWord(misspelled), correctedWords);
+        TreeSet<CorrectedWord> candidateList = this.findCorrectedWords(rulesAvailable, 10, new CandidateWord(misspelled), correctedWords);
     	
         if(candidateList.size() == 0)
         {
@@ -177,58 +192,6 @@ public final class Bootstrap {
         }
         
     	return candidateList.last().getWord();
-    }
-
-    public List<Candidate> findCandidates(String misspelled) {
-
-        long start = System.currentTimeMillis();
-
-        Iterator<SearchResult<Rule>> result = ahoCorasick.search(misspelled.toCharArray());
-
-        List<Rule> rulesAvailable = getAvailableRules(result);
-        
-        /*
-        * TODO: tek harf eklemeli kurallarin weight i cok fazla oldugu icin tum kurallarin onune geciyor.
-        * Bizim hatalarda en cok bu tarz hatalar oldugu icin en olasi kural olarak bunlari buluyor.
-        * Eger weight ini azaltabilirsek daha basarili sonuc verebilir!
-        * */
-        rulesAvailable.addAll(addOneCharRules);
-
-        Collections.sort(rulesAvailable);
-
-        List<Candidate> correctedWords = new ArrayList<Candidate>();
-        
-        findCorrectedWords(rulesAvailable, 0, Candidate.fromMisspelled(misspelled), correctedWords);
-        
-        System.out.println(isTurkishRequestCount);
-
-        log("Correction finished in " + (System.currentTimeMillis() - start) + " millis");
-        
-        if(candidateCount != -1 && correctedWords.size() > candidateCount){
-            return correctedWords.subList(0, candidateCount);
-        } else {
-            return correctedWords;
-        }
-
-    }
-
-    private List<Rule> getAvailableRules(Iterator<SearchResult<Rule>> result) {
-
-        List<Rule> rulesAvailable = new ArrayList<Rule>();
-
-        while (result.hasNext()){
-
-            SearchResult<Rule> searchResult = result.next();
-
-            for (Rule rule : searchResult.getOutputs()) {
-            	rule.setIndex(searchResult.getLastIndex() - rule.getBefore().length());
-                rulesAvailable.add(rule);
-            }
-
-        }
-
-        return rulesAvailable;
-
     }
     
     private Map<Byte, List<Rule>> getAvailableRulesAsMap(Iterator<SearchResult<Rule>> result) {
@@ -367,7 +330,7 @@ public final class Bootstrap {
 
     }
     
-    private TreeSet<CorrectedWord> findCorrectedWords2(Map<Byte, List<Rule>> rulesAvailable, int depth, CandidateWord candidateWord, List<CandidateWord> correctedWords){
+    private TreeSet<CorrectedWord> findCorrectedWords(Map<Byte, List<Rule>> rulesAvailable, int depth, CandidateWord candidateWord, List<CandidateWord> correctedWords){
         
     	/**
     	 * Finds root candidates
@@ -440,111 +403,6 @@ public final class Bootstrap {
         }
                 
         return correctedWordSet;
-    }
-
-    private void findCorrectedWords(List<Rule> rulesAvailable, int depth, Candidate fromCandidate, List<Candidate> correctedWords){
-
-        depth++;
-        
-        for (Rule rule : rulesAvailable) {
-
-            List<Candidate> candidates = fromCandidate.buildCandidates(rule);
-
-            for (Candidate candidate : candidates) {
-            	System.out.println( "Imma try this now: " + candidate.getCandidateWord() );
-                if(isTurkish(candidate.getCandidateWord())){
-
-                    if(correctedWords.contains(candidate)){
-
-                        Candidate priorCandidate = correctedWords.get(correctedWords.indexOf(candidate));
-
-                        if(candidate.getTotalWeight() > priorCandidate.getTotalWeight()){
-
-                            correctedWords.remove(priorCandidate);
-                            correctedWords.add(candidate);
-                            Collections.sort(correctedWords);
-
-                        }
-
-                    } else {
-
-                        correctedWords.add(candidate);
-                        Collections.sort(correctedWords);
-
-                    }
-
-                }
-
-                /*
-                * if max depth is exceeded, do not continue applying more rules
-                * */
-                if(depth < maxDepth){
-
-                    /*
-                    * if current candidates weight is less then the min weight in list,
-                    * no need to continue applying other rules on that candidate
-                    * */
-                    if(canAddMoreCandidates(correctedWords, candidate)){
-
-                        findCorrectedWords(rulesAvailable, depth, candidate, correctedWords);
-
-                    }
-
-                }
-
-            }
-
-            /*
-            * if we add next rule weight to fromCandidate and can not take place in top k,
-            * so no need to continue looping rules
-            * */
-            if(!nextRulesHaveChance(correctedWords, fromCandidate, rule.getLikelihood())){
-                return;
-            }
-
-        }
-
-    }
-
-    private boolean nextRulesHaveChance(List<Candidate> correctedWords, Candidate fromCandidate, double likelihood) {
-
-        if(candidateCount == -1 || correctedWords.size() < candidateCount){
-
-            return true;
-
-        } else {
-
-            double threshold = correctedWords.get(candidateCount - 1).getTotalWeight();
-            double minWeight = fromCandidate.getTotalWeight() + likelihood;
-
-            if(threshold < minWeight){
-
-                return true;
-
-            } else {
-
-                return false;
-
-            }
-
-        }
-
-    }
-
-    private boolean canAddMoreCandidates(List<Candidate> correctedWords, Candidate candidate) {
-
-        if(candidateCount == -1 || correctedWords.size() < candidateCount){
-
-            return true;
-
-        } else {
-
-            double threshold = correctedWords.get(candidateCount - 1).getTotalWeight();
-
-            return candidate.getTotalWeight() >= threshold;
-
-        }
-
     }
 
     private void log(String log){

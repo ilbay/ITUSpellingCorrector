@@ -34,7 +34,7 @@ public class CorrectedWord implements Comparable<CorrectedWord>{
 	
 	public int hashCode()
 	{
-		return this.word.hashCode() * (int)(-Math.round(this.totalWeight)) + this.word.hashCode();
+		return this.word.hashCode();
 	}
 
 	@Override

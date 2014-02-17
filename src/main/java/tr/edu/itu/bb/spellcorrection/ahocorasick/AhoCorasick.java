@@ -2,6 +2,7 @@ package tr.edu.itu.bb.spellcorrection.ahocorasick;
 
 import tr.edu.itu.bb.spellcorrection.util.CharacterUtil;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -13,7 +14,7 @@ import java.util.Queue;
  * @version $Revision$, $Date$
  */
 
-public class AhoCorasick<T> {
+public class AhoCorasick<T> implements Serializable{
 
     private Node<T> rootNode;
 

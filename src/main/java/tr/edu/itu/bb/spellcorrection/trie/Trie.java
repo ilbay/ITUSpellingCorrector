@@ -18,6 +18,7 @@ import tr.edu.itu.bb.spellcorrection.util.CharacterUtil;
 import tr.edu.itu.bb.spellcorrection.util.Util;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ import java.util.Locale;
  * Date: 4/29/13
  * Time: 11:00 PM
  */
-public class Trie {
+public class Trie implements Serializable{
 
     private Node rootNode;
 

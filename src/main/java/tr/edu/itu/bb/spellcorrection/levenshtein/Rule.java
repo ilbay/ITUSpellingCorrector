@@ -1,11 +1,13 @@
 package tr.edu.itu.bb.spellcorrection.levenshtein;
 
+import java.io.Serializable;
+
 /**
  * User: eren
  * Date: 5/4/13
  * Time: 4:14 PM
  */
-public class Rule implements Comparable<Rule>{
+public class Rule implements Comparable<Rule>, Serializable{
 
     private String before;
     private String after;

@@ -122,7 +122,7 @@ public class ZemberekEvaluator {
 
 
                     long start = System.currentTimeMillis();
-                    List<Candidate> candidates = bootstrap.findCandidates(parts[0]);
+                    String candidates = bootstrap.findCandidates(parts[0]);
                     long millis = System.currentTimeMillis() - start;
 
                     int index = getCorrectedIndex(candidates, parts[1]);
@@ -139,7 +139,7 @@ public class ZemberekEvaluator {
                             mcPositiveZemberekNegative++;
                         }
 
-                        writeEvaluation(writer, parts, candidates.get(0).getCandidateWord(), String.valueOf(index), String.valueOf(millis), zemberekCorrected, zemberekMillis);
+                        writeEvaluation(writer, parts, candidates, String.valueOf(index), String.valueOf(millis), zemberekCorrected, zemberekMillis);
 
 
                     } else {
@@ -193,16 +193,11 @@ public class ZemberekEvaluator {
 
     }
 
-    private int getCorrectedIndex(List<Candidate> candidates, String corrected) {
+    private int getCorrectedIndex(String candidates, String corrected) {
 
         int i = 0;
-        for (Candidate candidate : candidates) {
-
-            if (candidate.getCandidateWord().equals(corrected)) {
-                return i;
-            }
-
-            i++;
+        if (candidates.equals(corrected)) {
+        	return i;
         }
 
         return -1;

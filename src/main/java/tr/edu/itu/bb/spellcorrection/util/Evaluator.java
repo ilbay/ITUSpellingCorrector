@@ -82,12 +82,12 @@ public final class Evaluator {
 
                 String log = "original: \""  + parts[0] + "\"\tcorrected: \"";
 
-                List<Candidate> candidates = bootstrap.findCandidates(parts[0]);
+                String candidates = bootstrap.findCandidates(parts[0]);
 
                 long millis = System.currentTimeMillis() - start;
 
-                if(candidates != null && candidates.size() > 0){
-                    log += candidates.get(0).getCandidateWord() + "\"\tsupposed: \"" + parts[1] + "\"";
+                if(candidates != null){
+                    log += candidates + "\"\tsupposed: \"" + parts[1] + "\"";
                 } else {
                     log += "N\\A" + "\"\tsupposed: \"" + parts[1] + "\"";
                 }
@@ -96,7 +96,7 @@ public final class Evaluator {
                 if(index != -1){
 
                     correctedSize++;
-                    writeEvaluation(writer, parts, candidates.get(0).getCandidateWord(), String.valueOf(index), String.valueOf(millis));
+                    writeEvaluation(writer, parts, candidates, String.valueOf(index), String.valueOf(millis));
 
 
                 } else {
@@ -134,18 +134,12 @@ public final class Evaluator {
 
     }
 
-    private int getCorrectedIndex(List<Candidate> candidates, String corrected) {
+    private int getCorrectedIndex(String candidates, String corrected) {
 
         int i = 0;
-        for (Candidate candidate : candidates) {
-
-            if(candidate.getCandidateWord().equals(corrected)){
-                return i;
-            }
-
-            i++;
+        if(candidates.equals(corrected)){
+        	return i;
         }
-
         return -1;
 
     }

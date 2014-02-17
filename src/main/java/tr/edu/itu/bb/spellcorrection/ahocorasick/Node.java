@@ -2,6 +2,7 @@ package tr.edu.itu.bb.spellcorrection.ahocorasick;
 
 import tr.edu.itu.bb.spellcorrection.util.CharacterUtil;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  * @version $Revision$, $Date$
  */
 
-public final class Node<T> {
+public final class Node<T> implements Serializable{
 
     private int depth;
     private int subNodeCount;

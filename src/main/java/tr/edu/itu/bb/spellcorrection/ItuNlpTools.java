@@ -1,6 +1,7 @@
 package tr.edu.itu.bb.spellcorrection;
 
 import tr.edu.itu.bb.spellcorrection.levenshtein.Candidate;
+import tr.edu.itu.bb.spellcorrection.levenshtein.LevenshteinDistance;
 
 import java.util.List;
 
@@ -46,20 +47,20 @@ public class ItuNlpTools {
 
     public List<Candidate> execute(String input){
     	//System.out.println( "execute( " + input + " )" );
-    	System.out.println(bootstrap.findCandidates2(input));
+    	System.out.println(bootstrap.findCandidates(input));
         return null;
     	//return bootstrap.findCandidates(input);
     }
     
     public String executeAsString(String input)
     {
-    	return bootstrap.findCandidates2(input);
+    	return bootstrap.findCandidates(input);
     }
 
     public static void main(String[] args) throws Exception {
       //  System.out.println(new ItuNlpTools().execute("arba"));
     	
-        System.out.println(ItuNlpTools.getInstance().execute("seniseviyorum"));
+        System.out.println(ItuNlpTools.getInstance().execute("unurmak"));
         //MorphologicalAnalyzerServiceHandler.getInstance().isTurkish( "azm+rab" );
     }
 }

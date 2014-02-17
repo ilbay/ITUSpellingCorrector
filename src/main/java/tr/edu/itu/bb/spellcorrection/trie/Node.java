@@ -1,5 +1,7 @@
 package tr.edu.itu.bb.spellcorrection.trie;
 
+import java.io.Serializable;
+
 import tr.edu.itu.bb.spellcorrection.util.CharacterUtil;
 
 /**
@@ -7,7 +9,7 @@ import tr.edu.itu.bb.spellcorrection.util.CharacterUtil;
  * Date: 4/29/13
  * Time: 10:52 PM
  */
-public class Node {
+public class Node implements Serializable{
 
     private int depth;
     private int subNodeCount;

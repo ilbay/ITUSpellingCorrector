@@ -81,8 +81,8 @@ public final class ConsoleCorrector {
 
                     } else {
 
-                        List<Candidate> candidates = bootstrap.findCandidates(word);
-                        print(candidates);
+                        String candidates = bootstrap.findCandidates(word);
+                        System.out.println(candidates);
 
                         System.out.println("\nEnter a misspelled word or ?<rule> or enter to exit:");
                         word = reader.readLine();
