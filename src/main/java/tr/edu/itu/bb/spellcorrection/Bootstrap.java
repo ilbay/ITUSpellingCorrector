@@ -10,6 +10,7 @@ import tr.edu.itu.bb.spellcorrection.util.NotMisspelledWordException;
 import tr.edu.itu.bb.spellcorrection.util.Util;
 import tr.edu.itu.bb.spellcorrection.validators.DictionaryTurkishWordValidator;
 import tr.edu.itu.bb.spellcorrection.validators.ItuNlpToolsTurkishWordValidator;
+import tr.edu.itu.bb.spellcorrection.validators.OdtuCorpusTurkishWordValidator;
 import tr.edu.itu.bb.spellcorrection.validators.TurkishWordValidator;
 import tr.edu.itu.bb.spellcorrection.validators.ZemberekTurkishWordValidator;
 
@@ -35,7 +36,7 @@ public final class Bootstrap {
     private final int windowSize;
     private final String characterFile;
     private final String correctionsFile;
-    private final TurkishWordValidator turkishWordValidator;
+    private TurkishWordValidator turkishWordValidator;
     private Trie vocabularyTrie;
     private boolean TRAIN = true;
 
@@ -58,10 +59,9 @@ public final class Bootstrap {
         this.maxDepth = maxDepth;
         this.candidateCount = candidateCount;
         this.windowSize = windowSize;
-        this.turkishWordValidator = getTurkishWordValidator(turkishValidator, vocabularyFile);
 
         CharacterUtil.initCharacterMapping(characterFile);
-
+        this.turkishWordValidator = getTurkishWordValidator(turkishValidator, vocabularyFile);
     }
 
     private TurkishWordValidator getTurkishWordValidator(TurkishValidator turkishValidator, String vocabularyFile) throws Exception {
@@ -91,6 +91,9 @@ public final class Bootstrap {
     }
 
     public void init() throws Exception {
+    	//this.turkishWordValidator = new OdtuCorpusTurkishWordValidator();
+
+    	
         File ahoCorasickTrieFile = new File("data/model/AhoCorasickTrie.dat");
         if(this.TRAIN || !ahoCorasickTrieFile.exists() || ahoCorasickTrieFile.isDirectory())
         {
@@ -173,7 +176,7 @@ public final class Bootstrap {
     	
         List<Candidate> correctedWords = new ArrayList<Candidate>();
         
-        TreeSet<CorrectedWord> candidateList = this.findCorrectedWords(rulesAvailable, 10, new Candidate(misspelled), correctedWords);
+        TreeSet<CorrectedWord> candidateList = this.findCorrectedWords(rulesAvailable, 1, new Candidate(misspelled), correctedWords);
     	
         if(candidateList.size() == 0)
         {

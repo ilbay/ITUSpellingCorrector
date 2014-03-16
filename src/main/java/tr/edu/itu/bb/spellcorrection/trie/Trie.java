@@ -32,10 +32,9 @@ import java.util.Locale;
  */
 public class Trie implements Serializable{
 
-    private Node rootNode;
+    private final Node rootNode = new Node();
 
     public Trie() {
-        this.rootNode = Node.ROOT;
     }
 
     public void addWord(String word) {

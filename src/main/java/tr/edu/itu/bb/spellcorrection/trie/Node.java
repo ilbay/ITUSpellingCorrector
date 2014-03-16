@@ -20,9 +20,9 @@ public class Node implements Serializable{
     private Node parentNode;
     private Node[] subNodes;
 
-    public static final Node ROOT = new Node();
+    //public static final Node ROOT = new Node();
 
-    private Node() {
+    public Node() {
         this.depth = 0;
         this.parentNode = null;
         this.subNodes = new Node[CharacterUtil.getCharacterSize()];
