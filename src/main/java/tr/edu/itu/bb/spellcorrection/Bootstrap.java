@@ -368,6 +368,9 @@ public final class Bootstrap {
     			{
     				break;
     			}
+        	}else if(isTurkish(word.getRoot()+word.getSuffix()))
+        	{
+        		correctedWordSet.add(new CorrectedWord(word.getRoot()+word.getSuffix(), word.getTotalWeight()));
         	}
         	
         	for(int i = word.getIndex(); i < suffix.length(); i++)
