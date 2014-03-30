@@ -179,10 +179,8 @@ public final class Bootstrap {
     		Map.Entry<Byte, List<Rule>> pairs = (Map.Entry<Byte, List<Rule>>)it.next();
     		Collections.sort((List<Rule>)pairs.getValue());
     	}
-    	
-        List<Candidate> correctedWords = new ArrayList<Candidate>();
         
-        TreeSet<CorrectedWord> candidateList = this.findCorrectedWords(rulesAvailable, 1, new Candidate(misspelled), correctedWords);
+        TreeSet<CorrectedWord> candidateList = this.findCorrectedWords(rulesAvailable, 1, new Candidate(misspelled));
     	
         if(candidateList.size() == 0)
         {
@@ -341,7 +339,7 @@ public final class Bootstrap {
 
     }
     
-    private TreeSet<CorrectedWord> findCorrectedWords(Map<Byte, List<Rule>> rulesAvailable, int depth, Candidate candidateWord, List<Candidate> correctedWords){
+    private TreeSet<CorrectedWord> findCorrectedWords(Map<Byte, List<Rule>> rulesAvailable, int depth, Candidate candidateWord){
         
     	/**
     	 * Finds root candidates
