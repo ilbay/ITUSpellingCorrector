@@ -7,6 +7,7 @@ import tr.edu.itu.bb.spellcorrection.trie.CandidateSearcher;
 import tr.edu.itu.bb.spellcorrection.trie.Trie;
 import tr.edu.itu.bb.spellcorrection.util.CharacterUtil;
 import tr.edu.itu.bb.spellcorrection.util.NotMisspelledWordException;
+import tr.edu.itu.bb.spellcorrection.util.TurkishSyllableGenerator;
 import tr.edu.itu.bb.spellcorrection.util.Util;
 import tr.edu.itu.bb.spellcorrection.validators.DictionaryTurkishWordValidator;
 import tr.edu.itu.bb.spellcorrection.validators.ItuNlpToolsTurkishWordValidator;
@@ -153,6 +154,11 @@ public final class Bootstrap {
     {
     	long start = System.currentTimeMillis();
     	
+//    	if(isTurkish(misspelled))
+//    	{
+//    		return misspelled;
+//    	}
+    	
     	Iterator<SearchResult<Rule>> result = null;
     	Map<Byte, List<Rule>> rulesAvailable = null;
     	try
@@ -180,17 +186,19 @@ public final class Bootstrap {
     	
         if(candidateList.size() == 0)
         {
-        	int index = 1;
-        	while(index < misspelled.length())
+        	List<String> syllableList = TurkishSyllableGenerator.generateSyllableList(misspelled);
+        	StringBuilder firstPart = new StringBuilder();
+        	
+        	for(int i = 0; i < syllableList.size()-1; ++i)
         	{
-        		String w = misspelled.substring(0, index) + " " + misspelled.substring(index);
-        		if(isTurkish(misspelled.substring(0, index)) && isTurkish(misspelled.substring(index)))
+        		firstPart.append(syllableList.get(i));
+        		String secondPart = misspelled.substring(firstPart.length());
+        		if(isTurkish(firstPart.toString()) && isTurkish(secondPart))
         		{
-        			return w;
+        			return firstPart.toString()+ " " + secondPart;
         		}
-        		
-        		index=(index == 1 ? 2 : index+2);
         	}
+        	
         	return misspelled;
         }
         
