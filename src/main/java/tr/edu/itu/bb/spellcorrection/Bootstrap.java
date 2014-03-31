@@ -32,8 +32,6 @@ import java.util.*;
 
 public final class Bootstrap {
 
-    private final int maxDepth;
-    private final int candidateCount;
     private final int windowSize;
     private final String characterFile;
     private final String correctionsFile;
@@ -53,12 +51,10 @@ public final class Bootstrap {
         Dictionary
     }
 
-    public Bootstrap(String correctionsFile, String vocabularyFile, String characterFile, int maxDepth, int candidateCount, int windowSize, TurkishValidator turkishValidator) throws Exception {
+    public Bootstrap(String correctionsFile, String vocabularyFile, String characterFile, int windowSize, TurkishValidator turkishValidator) throws Exception {
 
         this.correctionsFile = correctionsFile;
         this.characterFile = characterFile;
-        this.maxDepth = maxDepth;
-        this.candidateCount = candidateCount;
         this.windowSize = windowSize;
 
         CharacterUtil.initCharacterMapping(characterFile);

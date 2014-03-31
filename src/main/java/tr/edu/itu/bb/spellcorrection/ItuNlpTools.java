@@ -16,8 +16,6 @@ public class ItuNlpTools {
     private static final String TRAINING_FILE = "data/model/TotalTrainingData-unique.txt";
     private static final Bootstrap.TurkishValidator TURKISH_VALIDATOR = Bootstrap.TurkishValidator.ItuNlpTools;
 
-    private static final int DEFAULT_CANDIDATE_SIZE = 3;
-    private static final int DEFAULT_DEPTH = 2;
     private static final int DEFAULT_WINDOW_SIZE = 3;
 
     private Bootstrap bootstrap = null;
@@ -26,7 +24,7 @@ public class ItuNlpTools {
 
     private ItuNlpTools() throws Exception {
 
-        this.bootstrap = new Bootstrap(TRAINING_FILE, null, CHAR_FILE, DEFAULT_DEPTH, DEFAULT_CANDIDATE_SIZE, DEFAULT_WINDOW_SIZE, TURKISH_VALIDATOR);
+        this.bootstrap = new Bootstrap(TRAINING_FILE, null, CHAR_FILE, DEFAULT_WINDOW_SIZE, TURKISH_VALIDATOR);
         bootstrap.init(); //kuralları, bir eklemeli kuralları oluşturuyor. kuralları aho corasick trie'ya ekliyor.
 
     }
