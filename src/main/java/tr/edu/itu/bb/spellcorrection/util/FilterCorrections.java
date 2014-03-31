@@ -43,7 +43,7 @@ public class FilterCorrections {
 
         Locale trLocale = new Locale("tr", "TR");
 
-        Bootstrap bootstrap = new Bootstrap(correctionsFile, stemsFile, characterFile, depth, candidates, windowSize, turkishValidator);
+        Bootstrap bootstrap = new Bootstrap(correctionsFile, stemsFile, characterFile, windowSize, turkishValidator);
         bootstrap.setVerbose(false);
         bootstrap.init();
 

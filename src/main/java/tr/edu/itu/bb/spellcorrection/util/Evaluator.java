@@ -57,7 +57,7 @@ public final class Evaluator {
 
         Locale trLocale = new Locale("tr", "TR");
 
-        Bootstrap bootstrap = new Bootstrap(trainingCorrectionsFile, stemsFile, characterFile, depth, candidates, windowSize, turkishValidator);
+        Bootstrap bootstrap = new Bootstrap(trainingCorrectionsFile, stemsFile, characterFile,windowSize, turkishValidator);
         bootstrap.setVerbose(false);
         bootstrap.init();
 

@@ -93,7 +93,7 @@ public class ZemberekEvaluator {
 
         Locale trLocale = new Locale("tr", "TR");
 
-        Bootstrap bootstrap = new Bootstrap(trainingCorrectionsFile, stemsFile, characterFile, depth, candidates, windowSize, Bootstrap.TurkishValidator.Zemberek);
+        Bootstrap bootstrap = new Bootstrap(trainingCorrectionsFile, stemsFile, characterFile, windowSize, Bootstrap.TurkishValidator.Zemberek);
         bootstrap.setVerbose(false);
         bootstrap.init();
 

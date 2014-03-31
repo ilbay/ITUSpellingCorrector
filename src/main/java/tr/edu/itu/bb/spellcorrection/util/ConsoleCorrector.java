@@ -36,7 +36,7 @@ public final class ConsoleCorrector {
             int windowSize = Integer.valueOf(args[5]);
             boolean useZemberekAsValidator= Boolean.valueOf(args[6]);
 
-            Bootstrap bootstrap = new Bootstrap(correctionsFile, vocabularyFile, characterFile, depth, maxCandidates, windowSize, useZemberekAsValidator ? Bootstrap.TurkishValidator.Zemberek : Bootstrap.TurkishValidator.Dictionary);
+            Bootstrap bootstrap = new Bootstrap(correctionsFile, vocabularyFile, characterFile, windowSize, useZemberekAsValidator ? Bootstrap.TurkishValidator.Zemberek : Bootstrap.TurkishValidator.Dictionary);
             bootstrap.setVerbose(true);
             bootstrap.init();
 
