@@ -339,13 +339,13 @@ public final class Bootstrap {
 
     }
     
-    private TreeSet<CorrectedWord> findCorrectedWords(Map<Byte, List<Rule>> rulesAvailable, int depth, Candidate candidateWord){
+    private TreeSet<CorrectedWord> findCorrectedWords(Map<Byte, List<Rule>> rulesAvailable, int maxCandidate, Candidate candidateWord){
         
     	/**
     	 * Finds root candidates
     	 */
     	CandidateSearcher searcher = new CandidateSearcher(candidateWord, this.vocabularyTrie, rulesAvailable);
-        List<WordInformation> candidateWordList = searcher.buildCandidateList(10);
+        List<WordInformation> candidateWordList = searcher.buildCandidateList();
         
         TreeSet<CorrectedWord> correctedWordSet = new TreeSet<>();
         
@@ -355,11 +355,11 @@ public final class Bootstrap {
         	int rootLength = candidateWord.getCandidateWord().length() - suffix.length();
         	if(word.getSuffix().equals(""))
         	{
-    			if((depth == correctedWordSet.size() && correctedWordSet.first().getTotalWeight() < word.getTotalWeight()) || depth > correctedWordSet.size())
+    			if((maxCandidate == correctedWordSet.size() && correctedWordSet.first().getTotalWeight() < word.getTotalWeight()) || maxCandidate > correctedWordSet.size())
     			{
     				if(isTurkish(word.getRoot()))
     				{
-    					if(depth == correctedWordSet.size())
+    					if(maxCandidate == correctedWordSet.size())
     						correctedWordSet.remove(correctedWordSet.first());
         				correctedWordSet.add(new CorrectedWord(word.getRoot(), word.getTotalWeight()));
     				}
@@ -396,11 +396,11 @@ public final class Bootstrap {
         			}
         			String newWord = word.getRoot() + newSuffix;
         			double newTotalWeight = word.getTotalWeight() + rule.getLikelihood();
-        			if((depth == correctedWordSet.size() && correctedWordSet.first().getTotalWeight() < newTotalWeight) || depth > correctedWordSet.size())
+        			if((maxCandidate == correctedWordSet.size() && correctedWordSet.first().getTotalWeight() < newTotalWeight) || maxCandidate > correctedWordSet.size())
         			{
         				if(isTurkish(newWord))
         				{
-        					if(depth == correctedWordSet.size())
+        					if(maxCandidate == correctedWordSet.size())
         						correctedWordSet.remove(correctedWordSet.first());
             				correctedWordSet.add(new CorrectedWord(newWord, newTotalWeight));
         				}

@@ -27,7 +27,7 @@ public class CandidateSearcher {
 		this.vocabularyTrie = vocabularyTrie;
 	}
 	
-	public List<WordInformation> buildCandidateList(int maxCandidate)
+	public List<WordInformation> buildCandidateList()
 	{
 		List<WordInformation> candidateList = new ArrayList<>();
 		Node rootNode = this.vocabularyTrie.getRootNode();
@@ -81,10 +81,6 @@ public class CandidateSearcher {
 			for(Rule rule : rules)
 			{
 				Candidate newCandidateWord = currentCandidateWord.applyRule(rule);
-				//if( candidateList.size() >= maxCandidate && candidateList.first().getTotalWeight() > newCandidateWord.getTotalWeight())
-				//{
-					//break;
-				//}
 				try
 				{
 					Node newCandidateCurrentNode = currentNode;
@@ -94,10 +90,6 @@ public class CandidateSearcher {
 					}
 					if(newCandidateCurrentNode.getOutput() != null && !newCandidateCurrentNode.getOutput().equals(""))
 					{
-						if(candidateList.size() == maxCandidate)
-						{
-							//candidateList.remove(candidateList.first());
-						}
 						candidateList.add(new WordInformation(newCandidateCurrentNode.getOutput(), newCandidateWord.getCandidateWord().substring(currentIndex+rule.getBefore().length()), newCandidateWord.getTotalWeight(), currentIndex+rule.getBefore().length()));
 					}
 					if(newCandidateCurrentNode != null) //TODO: This control seems not necessary
