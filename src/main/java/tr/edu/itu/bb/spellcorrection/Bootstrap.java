@@ -149,11 +149,18 @@ public final class Bootstrap {
     public String findCandidates(String misspelled)
     {
     	long start = System.currentTimeMillis();
-    	
-//    	if(isTurkish(misspelled))
-//    	{
-//    		return misspelled;
-//    	}
+    	    	
+    	List<String> syllableList = TurkishSyllableGenerator.generateSyllableList(misspelled);
+    	StringBuilder firstPart = new StringBuilder();
+    	for(int i = 0; i < syllableList.size()-1; ++i)
+    	{
+    		firstPart.append(syllableList.get(i));
+    		String secondPart = misspelled.substring(firstPart.length());
+    		if(firstPart.length() >=2 && secondPart.length() >=2 && isTurkish(firstPart.toString()) && isTurkish(secondPart))
+    		{
+    			return firstPart.toString()+ " " + secondPart;
+    		}
+    	}
     	
     	Iterator<SearchResult<Rule>> result = null;
     	Map<Byte, List<Rule>> rulesAvailable = null;
@@ -177,26 +184,8 @@ public final class Bootstrap {
     	}
         
         TreeSet<CorrectedWord> candidateList = this.findCorrectedWords(rulesAvailable, 1, new Candidate(misspelled));
-    	
-        if(candidateList.size() == 0)
-        {
-        	List<String> syllableList = TurkishSyllableGenerator.generateSyllableList(misspelled);
-        	StringBuilder firstPart = new StringBuilder();
-        	
-        	for(int i = 0; i < syllableList.size()-1; ++i)
-        	{
-        		firstPart.append(syllableList.get(i));
-        		String secondPart = misspelled.substring(firstPart.length());
-        		if(isTurkish(firstPart.toString()) && isTurkish(secondPart))
-        		{
-        			return firstPart.toString()+ " " + secondPart;
-        		}
-        	}
-        	
-        	return misspelled;
-        }
         
-    	return candidateList.last().getWord();
+    	return candidateList.size() > 0 ?candidateList.last().getWord() : misspelled;
     }
     
     private Map<Byte, List<Rule>> getAvailableRulesAsMap(Iterator<SearchResult<Rule>> result) {

@@ -48,6 +48,6 @@ public class ItuNlpTools {
     }
     
     public static void main(String[] args) throws Exception {
-        System.out.println(ItuNlpTools.getInstance().execute("diyorumm"));
+        System.out.println(ItuNlpTools.getInstance().execute("hepberaber"));
     }
 }
