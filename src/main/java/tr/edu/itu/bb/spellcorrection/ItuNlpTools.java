@@ -13,7 +13,7 @@ import java.util.List;
 public class ItuNlpTools {
 
     private static final String CHAR_FILE = "data/model/characters.txt";
-    private static final String TRAINING_FILE = "data/model/TotalTrainingData-unique.txt";
+    private static final String TRAINING_FILE = "data/model/TotalTrainingData2-unique_1.txt";
     private static final Bootstrap.TurkishValidator TURKISH_VALIDATOR = Bootstrap.TurkishValidator.ItuNlpTools;
 
     private static final int DEFAULT_WINDOW_SIZE = 3;
@@ -48,6 +48,6 @@ public class ItuNlpTools {
     }
     
     public static void main(String[] args) throws Exception {
-        System.out.println(ItuNlpTools.getInstance().execute("hepberaber"));
+        System.out.println(ItuNlpTools.getInstance().execute("direk"));
     }
 }

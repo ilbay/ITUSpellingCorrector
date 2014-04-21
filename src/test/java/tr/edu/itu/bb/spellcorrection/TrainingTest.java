@@ -12,8 +12,8 @@ public class TrainingTest {
 		ItuNlpTools tools = ItuNlpTools.getInstance();
 
 		String inputFile = "data/model/TestFileContainingSpace.txt";
-		String outputFile = "data/evaluations/TotalOutputUniqueTrainingNotUniqueTest2014_04_06_4letters.txt";
-		String notFoundData = "data/evaluations/TotalNotFoundUniqueTrainingNotUniqueTest2014_04_06_4letters.txt";
+		String outputFile = "data/evaluations/TotalOutputUniqueTrainingNotUniqueTest2014_04_20_spacelast.txt";
+		String notFoundData = "data/evaluations/TotalNotFoundUniqueTrainingNotUniqueTest2014_04_20_spacelast.txt";
 		
 		int total = 0;
 		int found = 0;
